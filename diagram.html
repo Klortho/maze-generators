@@ -1,0 +1,69 @@
+<html>
+  <body>
+    <svg id='svg' width="1000" height="600" xmlns="http://www.w3.org/2000/svg">
+
+      <script type='text/javascript'>
+        var i, r, c;
+        const svg = document.getElementById('svg');
+        const dim = 70;
+        const leftM = 150;
+        const topM = 170;
+
+        function line(startX, startY, endX, endY) {
+          const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          p.setAttribute('d', `M${startX} ${startY} L${endX} ${endY}`);
+          p.setAttribute('stroke', 'black');
+          p.setAttribute('stroke-width', '3px');
+          svg.appendChild(p);
+        }
+        function horiz(x, y, len) {
+          line(x, y, x + len, y);
+        }
+        function vert(x, y, len) {
+          line(x, y, x, y + len);
+        }
+
+        for (i = 0; i < 4; ++i) {
+          horiz(leftM, topM + i * dim, dim * 4);
+        }
+        for (i = 0; i < 5; ++i) {
+          vert(leftM + i * dim, topM, dim * 3);
+        }
+
+        function txt(x, y, msg, noBold) {
+          const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          t.setAttribute('x', x);
+          t.setAttribute('y', y);
+          const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+          if (typeof noBold === 'undefined' || !noBold)
+            tspan.setAttribute('font-weight', 'bold');
+          tspan.textContent = msg;
+          t.appendChild(tspan);
+          svg.appendChild(t);
+        }
+        for (r = 0; r < 3; ++r) {
+          for (c = 0; c < 4; ++c) {
+            txt(leftM + 10 + dim * c, topM + 30 + dim * r, `${r}, ${c} ${c < 3 ? "→" : ''}`);
+          }
+        }
+        for (r = 0; r < 2; ++r) {
+          for (c = 0; c < 4; ++c) {
+            txt(leftM + 20 + dim * c, topM + 50 + dim * r, '↓');
+          }
+        }
+
+        var h = 20;
+        function capLine(x, y, msg) {
+          txt(x, y, msg, true);
+        }
+        txt(leftM, 50, 'How wall data are stored with the cells (indexing scheme).');
+        capLine(leftM + 30, 70 + h, 'rows = 3');
+        capLine(leftM + 30, 70 + 2*h, 'cols = 4');
+        capLine(leftM + 30, 70 + 3*h, 'number of walls = rows ⨉ (cols-1) + (rows-1) ⨉ cols');
+        capLine(leftM + 138, 70 + 4*h, '= 9 + 8 = 17');
+
+      </script>
+
+    </svg>
+  </body>
+</html>
