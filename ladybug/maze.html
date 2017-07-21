@@ -1,0 +1,96 @@
+<html>
+  <head>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.js'></script>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/fabric.js/1.3.0/fabric.min.js'></script>
+    <script src='maze.js'></script>
+    <style type='text/css'>
+      #canvas {
+          width: 100%;
+          height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Can you help Ms. Lady get to the finish?</h1>
+    <audio preload='auto' id='audio'>
+      <source src="try-audio/call-me-the-breeze.mp3" type="audio/mpeg" />
+      <em>Sorry, your browser doesn't support HTML5 audio.</em>
+    </audio>
+    
+    <canvas id='canvas' width='1000' height='1000'></canvas>
+   
+    <h2>Thank you sir may I have another?</h2>
+    <form action='maze.html' method='GET'>
+      <table>
+        <tr>
+          <td><label for='r'>Rows:</label></td>
+          <td><input id='r' name='r' type='text' value='20' /></td>
+        </tr>
+        <tr>
+          <td><label for='c'>Columns:</label></td>
+          <td><input id='c' name='c' type='text' value='20' /></td>
+        </tr>
+        <tr>
+          <td><label for='wt'>Wall thickness:</label></td>
+          <td><input id='wt' name='wt' type='text' value='6' /></td>
+        </tr>
+        <tr>
+          <td><label for='clr'>Color:</label></td>
+          <td><input id='clr' name='clr' type='text' value='red' /></td>
+        </tr>
+        <tr>
+          <td><label for='s'>Speed (0 - 9):</label></td>
+          <td><input id='s' name='s' type='text' value='5' /></td>
+        </tr>
+        <tr>
+          <td align='right'><input id='nt' name='nt' type='checkbox' value='true' /></td>
+          <td><label for='nt'>No trail</label></td>
+        </tr>
+        <tr>
+          <td align='right'><input id='ns' name='ns' type='checkbox' value='true' /></td>
+          <td><label for='ns'>No sound</label></td>
+        </tr>
+        <tr>
+          <td><label for='je'>Jump easing:</label></td>
+          <td>
+            <select id="je" name='je'>
+              <option value='easeInQuad'>easeInQuad</option>
+              <option value='easeOutQuad'>easeOutQuad</option>
+              <option value='easeInOutQuad'>easeInOutQuad</option>
+              <option value='easeInCubic'>easeInCubic</option>
+              <option value='easeOutCubic'>easeOutCubic</option>
+              <option value='easeInOutCubic'>easeInOutCubic</option>
+              <option value='easeInQuart'>easeInQuart</option>
+              <option value='easeOutQuart'>easeOutQuart</option>
+              <option value='easeInOutQuart'>easeInOutQuart</option>
+              <option value='easeInQuint'>easeInQuint</option>
+              <option value='easeOutQuint'>easeOutQuint</option>
+              <option value='easeInOutQuint'>easeInOutQuint</option>
+              <option value='easeInSine' selected='selected'>easeInSine</option>
+              <option value='easeOutSine'>easeOutSine</option>
+              <option value='easeInOutSine'>easeInOutSine</option>
+              <option value='easeInExpo'>easeInExpo</option>
+              <option value='easeOutExpo'>easeOutExpo</option>
+              <option value='easeInOutExpo'>easeInOutExpo</option>
+              <option value='easeInCirc'>easeInCirc</option>
+              <option value='easeOutCirc'>easeOutCirc</option>
+              <option value='easeInOutCirc'>easeInOutCirc</option>
+              <option value='easeInElastic'>easeInElastic</option>
+              <option value='easeOutElastic'>easeOutElastic</option>
+              <option value='easeInOutElastic'>easeInOutElastic</option>
+              <option value='easeInBack'>easeInBack</option>
+              <option value='easeOutBack'>easeOutBack</option>
+              <option value='easeInOutBack'>easeInOutBack</option>
+              <option value='easeInBounce'>easeInBounce</option>
+              <option value='easeOutBounce'>easeOutBounce</option>
+              <option value='easeInOutBounce'>easeInOutBounce</option>
+            </select>
+          </td>
+        </tr>
+      </table>
+      <input type='submit'/>
+    </form>
+    <script data-gittip-username="Klortho" 
+      data-gittip-widget="button" src="//gttp.co/v1.js"></script>
+  </body>
+</html>
