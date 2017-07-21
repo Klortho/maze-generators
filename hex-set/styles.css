@@ -1,0 +1,55 @@
+/**
+ * Index page styles.
+ *
+ * The following styles are for demo purposes only!
+ *
+ * You'll probably use some base Django app with common header/footer/UI
+ * so you don't need any of the following styles.
+ */
+
+html {
+  font: 10px/1.5 Arial, Helvetica, sans-serif;
+}
+
+body {
+  margin: 0 auto;
+  padding: 0;
+  max-width: 960px;
+  font-size: 1.7rem;
+}
+
+a {
+  color: #0078c7;
+}
+
+p {
+  margin: 1.5rem 0;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+code {
+    background-color: #eee;
+    padding: 0.2rem 0.4rem;
+}
+
+.page-header {
+  overflow: hidden;
+  margin: 3rem 0;
+}
+
+.page-header > .title {
+  font-size: 3rem;
+  line-height: 6rem;
+  margin: 0;
+  float: left;
+}
+
+.page-header > .user {
+  float: right;
+  line-height: 2rem;
+  padding: 2rem;
+  background-color: #f5f5f5;
+}
