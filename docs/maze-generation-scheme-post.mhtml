@@ -1,0 +1,186 @@
+From: <Saved by Blink>
+Subject: Maze generation
+Date: Tue, 3 Jul 2017 16:54:58 -0000
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----MultipartBoundary--igrWczDAD36ngakbgtkrUXualNb9vniBq8uz5DiAXY----"
+
+------MultipartBoundary--igrWczDAD36ngakbgtkrUXualNb9vniBq8uz5DiAXY----
+Content-Type: text/html
+Content-ID: <frame-374-1438d8ab-09f2-4a13-9e82-78b9e29f9fee@mhtml.blink>
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://www.ccs.neu.edu/home/shivers/mazes.html
+
+<html><head><meta http-equiv=3D"Content-Type" content=3D"text/html; charset=
+=3Dwindows-1252">
+<title>Maze generation</title>
+</head>
+
+<body>
+<h1>Maze generation</h1>
+
+<p>
+I have <a href=3D"http://www.ccs.neu.edu/home/shivers/maze.tgz">Scheme code=
+</a> to
+generate random mazes using an algorithm based on Tarjan's disjoint-set
+data-structure with amortised union-find operations.=20
+It runs on top of
+<a href=3D"http://www-swiss.ai.mit.edu/~jar/s48.html">Scheme 48</a>.
+However, it is pretty simple code, and should be easy to port to other
+systems.
+
+</p><p>
+The program has two back-ends: one uses the Functional PostScript package
+to render to PostScript, the other prints out mazes with a text representat=
+ion.
+The maze is generated on a hexagonal tiling of a square area, just for
+fun.
+
+</p><p>
+You can see a <a href=3D"http://www.ccs.neu.edu/home/shivers/bigmaze.ps">la=
+rge sample maze</a>,=20
+it's  <a href=3D"http://www.ccs.neu.edu/home/shivers/bigmaze-sol.ps">soluti=
+on</a>,=20
+a <a href=3D"http://www.ccs.neu.edu/home/shivers/maze.ps">smaller maze</a>,=
+=20
+or a <a href=3D"http://www.ccs.neu.edu/home/shivers/mobymaze.ps.gz">maze fo=
+r the truly persistent</a>,
+all in PostScript format.
+
+</p><p>
+By the way: one of the students here,=20
+<a href=3D"http://www.ai.mit.edu/people/rlg/rlg.html">Robert Givan</a>,=20
+<em>has</em> solved the=20
+<a href=3D"http://www.ccs.neu.edu/home/shivers/mobymaze.ps.gz">maze for the=
+ truly persistent</a>
+by hand.=20
+So it can be done.
+If you are as crazy as Robert is.
+
+</p><h2>The Algorithm</h2>
+How should one dig a maze?
+Here's a simple "straw man" algorithm:
+Tile the maze area=20
+(I used hexagons for fun; squares are much simpler to work with).
+Pick a random starting point at the top of the maze area, start there,
+and do a random depth-first search of the maze, knocking down walls as
+you search out the maze. Mark cells as you go, so you never visit a cell
+twice. Then open up a random cell at the bottom.
+
+<p>
+The problem with this algorithm is that the initial paths will be long
+corridors snaking through the maze.
+As a result, the later branches off of these corridors will be constrained
+to be short digressions.
+So the true branch factor is not high; once you get onto one of the long
+"highways," it's hard to get lost.
+
+</p><p>
+A better algorithm uses the fast union/find disjoint-set data-structure.
+Again, we start out by tiling the maze area,=20
+then we randomly knock down walls in the maze until all the cells are
+connected.
+We never knock down a wall between two cells <em>c1</em> and <em>c2</em>=20
+if there is already a path from <em>c1</em> to <em>c2</em>,=20
+so that when we are done, there is only one path between any two cells.
+
+</p><p>
+The algorithm maintains sets of cells representing connected components
+in the maze.
+That is, cells <em>c1</em> and <em>c2</em> are in set S iff there is a=20
+path from <em>c1</em> to <em>c2</em>.
+When we knock down a wall between two cells, we union their sets together.
+
+</p><p>
+The algorithm starts by putting each cell in a singleton set, so there
+are as many sets as there are cells.
+Then it builds a vector containing all the walls in the maze;
+this vector is then randomly permuted.
+The inner loop of the maze builder scans the wall vector;
+for each wall w, it considers the wall's neighboring cells,=20
+<em>c1</em> and <em>c2</em>. =20
+If <em>c1</em> and <em>c2</em> are in the same set, there is already a path
+between the two cells, so the wall is left in place.
+Otherwise, the wall is knocked down (which joins the two regions of the
+maze), and the two sets are unioned together.
+If the resulting set contains all the cells in the maze, we are done.
+
+</p><p>
+After digging the maze, the program finds the path length between every
+pair of top-row and bottom-row cells.
+The pair with the longest path between them are chosen as the entry and
+exit cells, and are opened up accordingly.
+So we choose the most difficult entry and exit cell we can, given the maze.
+This is done by using DFS to build a tree for the maze, then re-rooting
+the tree at each top-row cell, and searching backwards from each bottom-row
+cell, counting path length.
+
+</p><p>
+Finally, the maze is printed out using one of the back-ends.
+
+</p><h2>The big one</h2>
+The biggest maze (mobymaze.ps) is 350x450 hex cells,=20
+about the limit of what I figured I could render on a=20
+single 8.5" x 11" sheet with a standard laser printer.
+(Actually, I could go finer, but most senior faculty here at MIT
+can't resolve the 350x450 maze without using a magnifying glass,
+so I think we'll leave it at that).
+It renders to about 6Mb of PostScript.
+It took about 102 CPU minutes to build the maze
+on a 90Mhz Pentium box running Scheme 48 with 13 Mword semispaces.
+Permuting the wall vector seems to be particularly slow, which is odd;
+perhaps my random number generator is bad.
+Printing the maze in PostScript format is also quite slow,
+probably due to S48's slow I/O.
+
+<p>
+The Pentium box was thrashing the disk the whole time it ran;=20
+wall time was much, much greater than 102 CPU minutes, and the
+entire computer was essentially unusable for any other task while the maze
+was being built.
+For starters, an algorithm that traverses a data-structure in
+a random order is, by design, going to exhibit zero locality.
+Secondly, Scheme 48's garbage collector is not generational,=20
+and hence copies the megabytes of maze data-structure back and forth on eve=
+ry
+GC.
+I could probably have helped the GC issue by dumping out a custom
+heap image containing only the maze code --- flushing the rest of
+the runtime (compiler, repl loop, and so forth and so forth) ---
+thus minimising the heap data.
+
+</p><p>
+It is intriguing to consider the color PostScript printer we have
+over at the Media Lab.
+It prints on rolls of paper three feet wide;=20
+images can be as long as you like.
+Then you could <em>really</em> get lost.
+
+</p><h2>More Maze Madness</h2>
+
+Putting this page on the Net brought some other maze freaks out of hiding.
+John Tromp in the Netherlands has an extremely cool=20
+<a href=3D"http://www.cwi.nl/~tromp/maze.html">maze generator</a> that
+only needs enough memory to store one row of the maze -- print mazes
+that go for miles!
+Gareth McCaughan at Cambridge has a=20
+<a href=3D"http://www.pmms.cam.ac.uk/~gjm11/programs/maze/index.html">
+web page</a>
+describing a fast C program for generating Postscript mazes using
+the union/find technique I've described here.
+Chris Okasaki at CMU has a number of=20
+<a href=3D"http://www.cs.columbia.edu/~cdo/maze/maze.html">
+lovely mazes</a>
+in Postscript format <em>and</em> a Java web-generator applet that will
+run in your web browser!
+
+<p>
+</p><address><a href=3D"http://www.ccs.neu.edu/home/shivers/">Olin Shivers<=
+/a>
+         / shivers at ccs dot neu dot edu</address>
+
+
+
+</body></html>
+------MultipartBoundary--igrWczDAD36ngakbgtkrUXualNb9vniBq8uz5DiAXY------
