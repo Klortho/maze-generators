@@ -1,0 +1,56 @@
+<html>
+  <head>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.js'></script>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/fabric.js/1.3.0/fabric.min.js'></script>
+    <script src='maze.js'></script>
+    <style type='text/css'>
+      #canvas {
+          width: 100%;
+          height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Try fabric.js</h1>
+    <p>Use the `use` query string parameter to determine how it is rendered:</p>
+    <ul>
+      <li>`native` - native canvas methods</li>
+      <li>`fabric` - fabric.js with rectangles</li>
+      <li>`paths` - fabric.js with paths -- the winner!</li>
+    </ul>
+    <p>When rendered with individual rectangles for each wall (my first attempt), 
+      it was unacceptably slow, even after I tried some of the optimizations suggested
+      <a href='https://github.com/kangax/fabric.js/wiki/Optimizing-performance'>here</a>;
+      viz., setting `object.selectable=false` on the rectangles, and
+      `canvas.selection = false` on the canvas itself.</p>
+    <p>I initially thought that paths would be no better, because in the tutorial, he only
+      discusses using them to make polygons.  But then I read a bit of the SVG spec, and
+      realized I could use a single polyline for the whole maze, with `fill: "none"`.
+      It is pretty fast.</p>
+
+   <canvas id='canvas' width='1000' height='1000'></canvas>
+
+   <h2>Thank you sir may I have another?</h2>
+   <form action='maze.html' method='GET'>
+     <table>
+       <tr>
+         <td><label for='r'>Rows:</label></td>
+         <td><input id='r' name='r' type='text' value='20' /></td>
+       </tr>
+       <tr>
+         <td><label for='c'>Columns:</label></td>
+         <td><input id='c' name='c' type='text' value='20' /></td>
+       </tr>
+       <tr>
+         <td><label for='wt'>Wall thickness:</label></td>
+         <td><input id='wt' name='wt' type='text' value='6' /></td>
+       </tr>
+       <tr>
+         <td><label for='clr'>Color:</label></td>
+         <td><input id='clr' name='clr' type='text' value='red' /></td>
+       </tr>
+     </table>
+     <input type='submit'/>
+   </form>
+  </body>
+</html>
