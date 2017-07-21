@@ -1,4 +1,5 @@
-
+// Here's the numbering scheme for cells and walls:
+//
 // ------------------------------------
 // | 0,0 -> | 0,1 -> | 0,2 -> | 0,3   |
 // |  |     |  |     |  |     |  |    |
@@ -8,8 +9,8 @@
 // |        |        |        |       |
 // ------------------------------------
 
-const rows = 10;
-const cols = 10;
+const rows = 15;
+const cols = 15;
 var r, c;
 
 var cells = [];
@@ -26,8 +27,8 @@ for (r = 0; r < rows; ++r) {
 
 var numSets = rows * cols;
 
-// The total number of internal walls is the number of side walls plus the
-// number of bottom walls.
+// The total number of internal walls is the number of internal side walls
+// plus the number of internal bottom walls.
 var numSides = rows * (cols - 1);
 var numWalls = numSides + (rows - 1) * cols;
 
@@ -64,7 +65,7 @@ while (numSets > 1) {
   a[isSide ? 'sw' : 'bw'] = false;
   set(a).p = set(b);
   numSets--;
-  console.log('numSets now ' + numSets);
+  //console.log('numSets now ' + numSets);
 }
 
 // pick a start (at the top) and finish (at the bottom) cell
