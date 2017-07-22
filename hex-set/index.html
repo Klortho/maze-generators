@@ -13,6 +13,7 @@
     <div id='maze'></div>
     <script>
       const opts = mazer.optsFromQS(window.location.search);
+      console.log('opts: ', opts);
       const maze = new mazer.HexMaze(opts);
       mazer.svgDraw('#maze', maze, opts);
     </script>

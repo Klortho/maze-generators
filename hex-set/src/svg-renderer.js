@@ -2,9 +2,9 @@ import * as d3 from "d3";
 import 'd3-selection-multi';
 import {allDirections, cellWidth, cellHeight, hexSide, hexVertex} from './hex-maze.js';
 
-export function draw(selector, maze, opts) {
-  const width = opts.width || 1000;
-  const height = opts.height || 1000;
+export function draw(selector, maze) {
+  const width = maze.width || 1000;
+  const height = maze.height || 1000;
   const rows = maze.rows;
   const cols = maze.cols;
 
@@ -16,8 +16,8 @@ export function draw(selector, maze, opts) {
       height: height,
     });
 
-  const marginX = 10;
-  const marginY = 10;
+  const marginX = 2;
+  const marginY = 2;
   const scaleX = (width - 2 * marginX) / (cols + 0.5) / cellWidth;
   const scaleY = (height - 2 * marginY) / (rows + 0.25) / cellHeight;
   const drawingArea = svg.append('g')

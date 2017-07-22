@@ -23,5 +23,6 @@ export function optsFromQS(_qs) {
       qsOpts[k] = parseInt(val);
     }
   });
-  return setDefaultOpts(qsOpts);
+  return qsOpts;
+  //return setDefaultOpts(qsOpts);
 }

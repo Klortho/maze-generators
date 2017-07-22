@@ -36,10 +36,20 @@ export const hexSide = (coords, dir) => {
 
 export default class HexMaze {
   constructor(opts) {
-    this.width = opts.width;
-    this.height = opts.height;
-    this.rows = opts.rows;
-    this.cols = opts.cols;
+    const _opts = opts ? opts : {};
+    this.rows = _opts.rows || 30;
+    this.cols = _opts.cols || 30;
+    const prows = this.rows + 1/3;
+    const pcols = this.cols + 0.5;
+
+    this.width = 'width' in _opts ? _opts.width :
+      'height' in _opts ?
+        _opts.height * cellWidth/cellHeight * pcols/prows :
+      cellWidth * 10 * this.cols;
+    this.height = 'height' in _opts ? _opts.height :
+      'width' in _opts ?
+        _opts.width * cellHeight/cellWidth * prows/pcols :
+      cellHeight * 10 * this.cols;
 
     this.startCol = Math.floor(Math.random() * this.cols);
     this.finishCol = Math.floor(Math.random() * this.cols);
