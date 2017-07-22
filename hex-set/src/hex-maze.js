@@ -3,48 +3,23 @@
 // a hexagonal grid
 
 // The list of directions (integers from 0 to 5)
-const allDirections = Array.from({length: 6}).map( (v, i) => i );
+export const allDirections = Array.from({length: 6}).map( (v, i) => i );
 
 // Sum of two two-element arrays
-const addVectors = (v0, v1) => [v0[0] + v1[0], v0[1] + v1[1]];
+export const addVectors = (v0, v1) => [v0[0] + v1[0], v0[1] + v1[1]];
 
 // Given coords and direction, compute the coords of the adjacent cell. No
 // validation is done.
-const adjCoords = (coords, dir) => {
+export const adjCoords = (coords, dir) => {
   const deltaRow = [0, -1, -1, 0, 1, 1];
   const deltaCol = (coords[0] % 2) ?
     [-1, 0, 1, 1, 1, 0] : [-1, -1, 0, 1, 0, -1];
   return addVectors(coords, [deltaRow[dir], deltaCol[dir]]);
 };
 
-//--------------------------------------
-function setDefaultOpts(_opts) {
-  const opts = {};
-  opts.rows = 'rows' in _opts ? _opts.rows : 30;
-  opts.cols = 'cols' in _opts ? _opts.cols : 30;
-  opts.width = 'width' in _opts ? _opts.width : 20 * Math.sqrt(3) * opts.cols;
-  opts.height = 'height' in _opts ? _opts.height : 30 * opts.rows;
-  return opts;
-}
-
-// Helper to get options from a query string
-function optsFromQS(_qs) {
-  const qmark = _qs.indexOf('?');
-  const qs = (qmark !== -1) ? _qs.substr(qmark + 1) : _qs;
-  const qsOpts = {};
-  qs.split('&').forEach(function (pairStr) {
-    var pair = pairStr.replace(/\+/g, ' ').split('=');
-    var k = pair[0];
-    if (k.length > 0) {
-      var val = pair.length === 1 ? null : decodeURIComponent(pair[1]);
-      qsOpts[k] = parseInt(val);
-    }
-  });
-  return setDefaultOpts(qsOpts);
-}
 
 //--------------------------------------
-class Cell {
+export class Cell {
   constructor(maze, coords) {
     this.maze = maze;
     this.coords = coords;
@@ -117,7 +92,7 @@ class Cell {
 
 
 //--------------------------------------
-class HexMaze {
+export default class HexMaze {
   constructor(opts) {
     this.width = opts.width;
     this.height = opts.height;
@@ -194,98 +169,24 @@ class HexMaze {
 // drawing library.
 
 // Actual x, y deltas for the verteces of a hexagon
-const sqrt3 = Math.sqrt(3);
-const cw = sqrt3;
-const ch = 1.5;
+export const cw = Math.sqrt(3);
+export const ch = 1.5;
 
-const hexPoints = allDirections.map(dir => {
+export const hexPoints = allDirections.map(dir => {
   const angle = (2.5 + dir) * Math.PI / 3;
   return [Math.cos(angle), Math.sin(angle)];
 });
 
-const cellCenter = coords => {
+export const cellCenter = coords => {
   const [r, c] = coords;
   return [0.5 * (1 + r%2 + 2*c) * cw, 1 + r * ch];
 };
 
-const hexVertex = (coords, dir) => {
+export const hexVertex = (coords, dir) => {
   const ctr = cellCenter(coords);
   return addVectors(ctr, hexPoints[dir]);
 }
 
-const hexSide = (coords, dir) => {
+export const hexSide = (coords, dir) => {
   return [hexVertex(coords, dir), hexVertex(coords, (dir+1)%6)];
 };
-
-const marginX = 10;
-const marginY = 10;
-
-const round = num => Math.round(num*100000 + 0.1)/100000;
-
-const pathPoint = p => `${round(p[0])},${round(p[1])}`;
-
-//--------------------------------------
-// svg
-class SvgArea {
-  constructor(selector, opts) {
-    this.svgElem = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    document.querySelector(selector).appendChild(this.svgElem);
-
-    this.width = opts.width;
-    this.height = opts.height;
-    this.svg = d3.select('svg')
-      .attrs({
-        width: this.width,
-        height: this.height,
-      });
-
-    const scaleX = (this.width - 2 * marginX) / (opts.cols + 0.5) / cw;
-    const scaleY = (this.height - 2 * marginY) / (opts.rows + 0.25) / ch;
-
-    this.drawingArea = this.svg.append('g')
-      .attr('transform', `translate(${marginX}, ${marginY}) scale(${scaleX}, ${scaleY})`);
-  }
-
-
-  drawSeg(points) {
-    const [start, end] = points;
-    this.drawingArea.append('path')
-      .attrs({
-        d: `M${pathPoint(start)}L${pathPoint(end)}`,
-        stroke: 'black',
-        'stroke-linecap': 'round',
-        'vector-effect': 'non-scaling-stroke',
-      });
-  }
-
-  colorize(maze) {
-    maze.traverse(maze.startCell(), (cell, distance) => {
-      const hue = (distance * 5) % 360;
-      this.colorizeCell(cell, hue, '100%', '70%', 0.2);
-    });
-  }
-
-  colorizeCell(cell, h, s, l, a) {
-    const svgPath = allDirections.map(dir =>
-      (dir === 0 ? 'M' : 'L') + pathPoint(hexVertex(cell.coords, dir)) + ' '
-    ).join('') + 'Z';
-    this.drawingArea.append('path')
-      .attrs({
-        d: svgPath,
-        stroke: 'none',
-        fill: `hsla(${h},${s},${l},${a}`,
-      });
-  }
-
-  draw(maze) {
-    for (var r = 0; r < maze.rows; ++r) {
-      for (var c = 0; c < maze.cols; ++c) {
-        const coords = [r, c];
-        const cell = maze.fetchCell(coords);
-        allDirections.forEach(dir => {
-          if (cell.hasWall(dir)) this.drawSeg(hexSide(coords, dir));
-        });
-      }
-    }
-  }
-}

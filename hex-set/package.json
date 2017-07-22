@@ -1,0 +1,22 @@
+{
+  "name": "hex-mazer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "mazer.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "rollup": "^0.45.2",
+    "rollup-plugin-node-resolve": "^3.0.0"
+  },
+  "dependencies": {
+    "d3": "^4.10.0",
+    "d3-selection-multi": "^1.0.1"
+  }
+}

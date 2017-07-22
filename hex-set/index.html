@@ -2,21 +2,17 @@
   <head>
     <meta charset="UTF-8">
     <title>amazing-app</title>
-    <script src='lib/d3.v4.min.js'></script>
-    <script src='lib/d3-selection-multi.v1.min.js'></script>
   </head>
   <body>
     <header class="page-header">
       <h1 class="title">amazing-app</h1>
     </header>
-    <script src='mazer.js'></script>
+    <script src='dist/bundle.js'></script>
     <div id='maze'></div>
     <script>
-      const opts = optsFromQS(window.location.search);
-      const maze = new HexMaze(opts);
-      const svg = new SvgArea('#maze', opts);
-      svg.draw(maze);
-      svg.colorize(maze);
+      const opts = mazer.optsFromQS(window.location.search);
+      const maze = new mazer.HexMaze(opts);
+      mazer.svgDraw('#maze', maze, opts);
     </script>
     <p>
       Use query-string parameters to control the size and dimensions of the
