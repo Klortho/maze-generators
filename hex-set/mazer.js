@@ -52,13 +52,13 @@ class Cell {
     this.setp = this;
   }
 
-  // Get the set that this cell belongs to. A set corresponds to the cell that
-  // is at the root of this subtree. Every cell starts out in its own one-cell
-  // set (the root of its own subtree). The `setp` property is a pointer to
-  // the value of the root of this subtree the last time we checked -- it's a
-  // cache of subtree root value. Every time getSet() is called, it starts
-  // with that last value, recurses up until it finds the (possibly new)
-  // subtree root, and then records the new value.
+  // Get the set that this cell belongs to. The set is identified by the cell
+  // that's currently at the root of this subtree. Every cell starts out in
+  // its own one-cell set (it is the root of its own subtree). The `setp`
+  // property is a cache of the reference to the root cell the last time
+  // getSet() was called. Every time getSet() is called, it starts
+  // with that last value, recurses up until it finds the current root,
+  // and then records the new value.
   getSet() {
     if (this.setp === this) return this;
     const mySet = this.setp.getSet();
@@ -115,6 +115,7 @@ class Cell {
   }
 }
 
+
 //--------------------------------------
 class HexMaze {
   constructor(opts) {
@@ -147,6 +148,10 @@ class HexMaze {
     return this.validCoords(coords) ? this.fetchCell(coords) : null;
   }
 
+  startCell() {
+    return this.getCell([0, this.startCol]);
+  }
+
   // Compute the maze
   mazify() {
     var r, c;
@@ -160,6 +165,27 @@ class HexMaze {
         }
       });
     });
+  }
+
+  // Traverse the maze with a depth-first search, calling f at each cell
+
+  traverse(start, f) {
+    const stack = [[null, start, 0]];
+
+    function visit() {
+      const [source, current, distance] = stack.pop();
+      f(current, distance);
+      allDirections.forEach(dir => {
+        if (current.isConnected(dir)) {
+          const adj = current.adjacent(dir);
+          if (adj !== source) {
+            stack.push([current, adj, distance+1]);
+          }
+        }
+      });
+    }
+
+    while (stack.length > 0) visit();
   }
 }
 
@@ -182,15 +208,21 @@ const cellCenter = coords => {
   return [0.5 * (1 + r%2 + 2*c) * cw, 1 + r * ch];
 };
 
-const hexSide = (coords, dir) => {
+const hexVertex = (coords, dir) => {
   const ctr = cellCenter(coords);
-  const start = addVectors(ctr, hexPoints[dir]);
-  const end = addVectors(ctr, hexPoints[(dir + 1) % 6]);
-  return [start, end];
+  return addVectors(ctr, hexPoints[dir]);
+}
+
+const hexSide = (coords, dir) => {
+  return [hexVertex(coords, dir), hexVertex(coords, (dir+1)%6)];
 };
 
 const marginX = 10;
 const marginY = 10;
+
+const round = num => Math.round(num*100000 + 0.1)/100000;
+
+const pathPoint = p => `${round(p[0])},${round(p[1])}`;
 
 //--------------------------------------
 // svg
@@ -214,18 +246,34 @@ class SvgArea {
       .attr('transform', `translate(${marginX}, ${marginY}) scale(${scaleX}, ${scaleY})`);
   }
 
-  pathPoint(p) {
-    return `${p[0]},${p[1]}`;
-  }
 
   drawSeg(points) {
     const [start, end] = points;
     this.drawingArea.append('path')
       .attrs({
-        d: `M${this.pathPoint(start)}L${this.pathPoint(end)}`,
+        d: `M${pathPoint(start)}L${pathPoint(end)}`,
         stroke: 'black',
         'stroke-linecap': 'round',
         'vector-effect': 'non-scaling-stroke',
+      });
+  }
+
+  colorize(maze) {
+    maze.traverse(maze.startCell(), (cell, distance) => {
+      const hue = (distance * 5) % 360;
+      this.colorizeCell(cell, hue, '100%', '70%', 0.2);
+    });
+  }
+
+  colorizeCell(cell, h, s, l, a) {
+    const svgPath = allDirections.map(dir =>
+      (dir === 0 ? 'M' : 'L') + pathPoint(hexVertex(cell.coords, dir)) + ' '
+    ).join('') + 'Z';
+    this.drawingArea.append('path')
+      .attrs({
+        d: svgPath,
+        stroke: 'none',
+        fill: `hsla(${h},${s},${l},${a}`,
       });
   }
 
@@ -241,11 +289,3 @@ class SvgArea {
     }
   }
 }
-
-
-/*
-//--------------------------------------
-m = new HexMaze(20, 20);
-m.mazify();
-draw(m);
-*/

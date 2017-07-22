@@ -2,8 +2,8 @@
   <head>
     <meta charset="UTF-8">
     <title>amazing-app</title>
-    <script src='https://d3js.org/d3.v4.min.js'></script>
-    <script src='https://d3js.org/d3-selection-multi.v1.min.js'></script>
+    <script src='lib/d3.v4.min.js'></script>
+    <script src='lib/d3-selection-multi.v1.min.js'></script>
   </head>
   <body>
     <header class="page-header">
@@ -16,6 +16,7 @@
       const maze = new HexMaze(opts);
       const svg = new SvgArea('#maze', opts);
       svg.draw(maze);
+      svg.colorize(maze);
     </script>
     <p>
       Use query-string parameters to control the size and dimensions of the
