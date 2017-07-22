@@ -1,5 +1,5 @@
 export {default as HexMaze} from './hex-maze.js';
-export { draw as svgDraw } from './svg-mazer.js';
+export { draw as svgDraw } from './svg-renderer.js';
 
 export function setDefaultOpts(_opts) {
   const opts = {};
