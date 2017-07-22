@@ -36,7 +36,7 @@ export function draw(selector, maze, opts) {
       });
   }
 
-  function colorizeCell(cell, h, s, l, a) {
+  function fillCell(cell, distance) {
     const svgPath = allDirections.map(dir =>
       (dir === 0 ? 'M' : 'L') + pathPoint(hexVertex(cell.coords, dir)) + ' '
     ).join('') + 'Z';
@@ -44,8 +44,18 @@ export function draw(selector, maze, opts) {
       .attrs({
         d: svgPath,
         stroke: 'none',
-        fill: `hsla(${h},${s},${l},${a}`,
+        fill: 'none',
+        'data-distance': distance,
+        'class': 'hexfill',
       });
+  }
+
+  const colorize = draw.colorize = hueFunc => {
+    document.querySelectorAll('.hexfill').forEach(path => {
+      const distance = parseInt(path.getAttribute('data-distance'));
+      const hsla = `hsla(${hueFunc(distance)},100%,70%,0.2)`;
+      path.setAttribute('fill', hsla);
+    });
   }
 
   for (var r = 0; r < rows; ++r) {
@@ -60,7 +70,8 @@ export function draw(selector, maze, opts) {
 
   // colorize
   maze.traverse(maze.startCell(), (cell, distance) => {
-    const hue = (distance * 5) % 360;
-    colorizeCell(cell, hue, '100%', '70%', 0.2);
+    fillCell(cell, distance);
   });
+
+  colorize(distance => (distance*5)%360);
 }
