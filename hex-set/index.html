@@ -9,18 +9,17 @@
     <header class="page-header">
       <h1 class="title">amazing-app</h1>
     </header>
-    <script src='dist/bundle.js'></script>
+    <script src='dist/bundle-browser.js'></script>
     <div id='maze'></div>
     <script>
       const opts = mazer.optsFromQS(window.location.search);
-      console.log('opts: ', opts);
       const maze = new mazer.HexMaze(opts);
-      mazer.svgDraw('#maze', maze, opts);
+      mazer.svgDraw('#maze', maze);
     </script>
     <p>
       Use query-string parameters to control the size and dimensions of the
       maze. For example, here's a
-      <a href='index.html?rows=100&cols=100&width=1000&height=1000'>100X100 cell maze</a>.
+      <a href='index.html?rows=100&amp;cols=100&amp;width=1000&amp;height=1000'>100X100 cell maze</a>.
     </p>
   </body>
 </html>

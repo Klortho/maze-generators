@@ -1,14 +1,6 @@
-export {default as HexMaze} from './hex-maze.js';
-export { draw as svgDraw } from './svg-renderer.js';
-
-export function setDefaultOpts(_opts) {
-  const opts = {};
-  opts.rows = 'rows' in _opts ? _opts.rows : 30;
-  opts.cols = 'cols' in _opts ? _opts.cols : 30;
-  opts.width = 'width' in _opts ? _opts.width : 20 * Math.sqrt(3) * opts.cols;
-  opts.height = 'height' in _opts ? _opts.height : 30 * opts.rows;
-  return opts;
-}
+import {default as HexMaze} from './hex-maze.js';
+import {draw as svgDraw} from './svg-renderer.js';
+export {HexMaze, svgDraw};
 
 // Helper to get options from a query string
 export function optsFromQS(_qs) {
@@ -24,5 +16,4 @@ export function optsFromQS(_qs) {
     }
   });
   return qsOpts;
-  //return setDefaultOpts(qsOpts);
 }

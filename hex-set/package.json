@@ -10,13 +10,17 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC",
+  "license": "WTFPL",
   "devDependencies": {
     "rollup": "^0.45.2",
-    "rollup-plugin-node-resolve": "^3.0.0"
+    "rollup-plugin-commonjs": "^8.0.2",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-watch": "^4.3.1"
   },
   "dependencies": {
+    "command-line-args": "^4.0.6",
     "d3": "^4.10.0",
-    "d3-selection-multi": "^1.0.1"
+    "d3-selection-multi": "^1.0.1",
+    "pdfkit": "^0.8.3"
   }
 }
