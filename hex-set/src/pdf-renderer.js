@@ -1,5 +1,6 @@
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
+const hsl = require('color-space/hsl');
 
 
 import {allDirections, cellWidth, cellHeight, hexSide, hexVertex} from './hex-maze.js';
