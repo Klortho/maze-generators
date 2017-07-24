@@ -1,7 +1,7 @@
 const args = require('command-line-args');
 
 import {default as HexMaze} from './hex-maze.js';
-import {draw as pdfDraw} from './pdf-renderer.js';
+import {draw as psDraw} from './ps-renderer.js';
 
 // Helper to get options from a command line
 function optsFromCLI() {
@@ -17,4 +17,4 @@ function optsFromCLI() {
 
 const opts = optsFromCLI();
 const maze = new HexMaze(opts);
-pdfDraw(maze, opts);
+psDraw(maze, opts);
