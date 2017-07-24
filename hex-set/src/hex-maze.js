@@ -1,7 +1,7 @@
 import {default as Cell} from './cell.js';
 import {propOk} from './utils.js';
 
-export var debug = true;
+export var debug = false;
 
 // Sum of two two-element arrays
 export const addVectors = (v0, v1) => [v0[0] + v1[0], v0[1] + v1[1]];

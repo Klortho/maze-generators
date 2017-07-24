@@ -11,7 +11,7 @@ function optsFromCLI() {
     { name: 'width', alias: 'w', type: parseInt, defaultValue: null, },
     { name: 'height', alias: 'h', type: parseInt, defaultValue: null, },
   ]);
-  console.log(opts);
+  //console.log(opts);
   return opts;
 }
 

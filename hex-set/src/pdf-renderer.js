@@ -4,7 +4,6 @@ const hsl = require('color-space/hsl');
 
 import {allDirections, cellWidth, cellHeight, hexSide, hexVertex} from './hex-maze.js';
 
-const round = num => Math.round(num*100000 + 0.1)/100000;
 const pathPoint = p => `${round(p[0])},${round(p[1])}`;
 
 function drawSeg(doc, points) {
