@@ -1,4 +1,7 @@
 import {default as Cell} from './cell.js';
+import {propOk} from './utils.js';
+
+export var debug = true;
 
 // Sum of two two-element arrays
 export const addVectors = (v0, v1) => [v0[0] + v1[0], v0[1] + v1[1]];
@@ -37,22 +40,28 @@ export const hexSide = (coords, dir) => {
 export default class HexMaze {
   constructor(opts) {
     const _opts = opts ? opts : {};
-    this.rows = _opts.rows || 30;
     this.cols = _opts.cols || 30;
-    const prows = this.rows + 1/3;
+    this.rows = _opts.rows || 30;
     const pcols = this.cols + 0.5;
+    const prows = this.rows + 1/3;
 
-    this.width = 'width' in _opts ? _opts.width :
-      'height' in _opts ?
-        _opts.height * cellWidth/cellHeight * pcols/prows :
+    const optOk = propOk(_opts);
+    this.width = optOk('width') ? _opts.width :
+      optOk('height') ? _opts.height * cellWidth/cellHeight * pcols/prows :
       cellWidth * 10 * this.cols;
-    this.height = 'height' in _opts ? _opts.height :
-      'width' in _opts ?
-        _opts.width * cellHeight/cellWidth * prows/pcols :
-      cellHeight * 10 * this.cols;
+    this.height = optOk('height') ? _opts.height :
+      optOk('width') ? _opts.width * cellHeight/cellWidth * prows/pcols :
+      cellHeight * 10 * this.rows;
 
     this.startCol = Math.floor(Math.random() * this.cols);
     this.finishCol = Math.floor(Math.random() * this.cols);
+
+    if (debug) {
+      console.log('Options: ', _opts);
+      console.log(`Maze parameters: cols=${this.cols}, rows=${this.rows}, ` +
+        `startCol=${this.startCol}, finishCol=${this.finishCol}, ` +
+        `width=${this.width}, height=${this.height}`);
+    }
 
     this.cells = Array.from({length: this.rows}, (v, r) =>
       Array.from({length: this.cols}, (v, c) =>
@@ -107,13 +116,17 @@ export default class HexMaze {
         }
       });
     });
+    // Set the depth of each cell
+    this.traverse(this.startCell(), (cell, depth) => {
+      cell.depth = depth;
+    });
+
   }
 
   // Traverse the maze with a depth-first search, calling f at each cell
 
   traverse(start, f) {
     const stack = [[null, start, 0]];
-
     function visit() {
       const [source, current, distance] = stack.pop();
       f(current, distance);
@@ -126,7 +139,6 @@ export default class HexMaze {
         }
       });
     }
-
     while (stack.length > 0) visit();
   }
 }
