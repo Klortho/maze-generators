@@ -28,27 +28,31 @@
           <tr>
             <td><label for='color'>Color?</label></td>
             <td>
-              <select id="color-sel" name='color-sel'>
+              <select id="color" name='color'>
                 <option value='aliceblue' style='background: aliceblue'>aliceblue</option>
                 </select>
             </td>
           </tr>
           <tr>
-            <td><label for='s'>Speed (0 - 9):</label></td>
-            <td><input id='s' name='s' type='text' value='5' /></td>
+            <td><label for='speed'>Speed (0 - 9):</label></td>
+            <td><input id='speed' name='speed' type='text' value='5' /></td>
           </tr>
           <tr>
-            <td align='right'><input id='nt' name='nt' type='checkbox' value='true' /></td>
-            <td><label for='nt'>No trail</label></td>
+            <td align='right'><input id='trail' name='trail' type='checkbox' value='true' /></td>
+            <td><label for='trail'>Leave a trail</label></td>
           </tr>
           <tr>
-            <td align='right'><input id='ns' name='ns' type='checkbox' value='true' /></td>
-            <td><label for='ns'>No sound</label></td>
+            <td align='right'><input id='sound' name='sound' type='checkbox' value='true' /></td>
+            <td><label for='sound'>Sound</label></td>
           </tr>
           <tr>
-            <td><label for='je'>Jump easing:</label></td>
+            <td align='right'><input id='music' name='music' type='checkbox' value='true' /></td>
+            <td><label for='music'>Music</label></td>
+          </tr>
+          <tr>
+            <td><label for='easing'>Jump easing:</label></td>
             <td>
-              <select id="je" name='je'>
+              <select id="easing" name='easing'>
                 <option value='easeInQuad'>easeInQuad</option>
                 <option value='easeOutQuad'>easeOutQuad</option>
                 <option value='easeInOutQuad'>easeInOutQuad</option>

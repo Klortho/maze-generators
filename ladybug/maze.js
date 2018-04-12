@@ -5,34 +5,52 @@ function LadyMaze() {
   this.moveDuration = 5 + (9 - this.speed) * 100;
   this.turnDuration = this.moveDuration / 5;
   
-  this.initialize();
-  this.computeMaze();
-  this.drawMaze();
+  // Initialize the canvas
+  this.canvas = new fabric.Canvas('canvas');
+  this.canvas.selection = false;
 
-  // Load the sprite image and kick things off
-  fabric.Image.fromURL('ladybug_red-100.png', this.spriteLoaded.bind(this));
+  // Initialize the background music
+  if (!this.opts.music) return;
+  const music = new Audio('sound/jj-cale-call-me-the-breezee-IDzMFe9y5JI.mp3');
+  music.play();
+  
+  // Load the sounds asyncronously, then continue
+  this.initSounds(() => {
+    
+    this.computeMaze();
+    this.drawMaze();
+    
+    // Load the sprite, then listen for keystrokes
+    this.initSprite(() => {  
+      $('body').on('keydown', this.handleKey.bind(this));
+    });
+    
+  });
+  
 }
 
+//////////////////////////////////////////////////////////////////////////
 LadyMaze.defaults = {
-  debug:  false,
+  debug:  true,
   rows:   20,
   cols:   20,
   color:  'red',
-  trail:  true,
   speed:  7,
-  music:  true,
+  trail:  true,
   sound:  true,
+  music:  true,
   easing:  'easeInSine'   // jump easing (http://fabricjs.com/animation-easing/)
 };
 
+//////////////////////////////////////////////////////////////////////////
 LadyMaze.prototype.getUrlOpts = function() {
   const defaults = LadyMaze.defaults;
   const opts = {};
-  Objects.keys(defaults).forEach(k => {
+  Object.keys(defaults).forEach(k => {
     opts[k] = defaults[k];
   });
   
-  const decode = s => decodeURIComponent(s.replace(pl, " "));
+  const decode = s => decodeURIComponent(s.replace(/\+/g, " "));
   const query = window.location.search.substring(1);
   const search = /([^&=]+)=?([^&]*)/g;
   var match;
@@ -58,7 +76,9 @@ LadyMaze.prototype.getUrlOpts = function() {
 
 
   
-// Makes the form sticky; called on document load
+//////////////////////////////////////////////////////////////////////////
+// Makes the form sticky
+
 LadyMaze.prototype.stickForm = function() {
   $('#rows').val(this.opts.rows);
   $('#cols').val(this.opts.cols);
@@ -67,26 +87,9 @@ LadyMaze.prototype.stickForm = function() {
   // FIXME: finish these
 };
 
-/////////////////////////////////////////////////////////////////////////
-LadyMaze.prototype.initialize = function() {
-  this.initCanvas();
-  this.initMusic();
-  this.initSound();
-  this.initMaze();
-};
 
-LadyMaze.prototype.initCanvas = function() {
-  this.canvas = new fabric.Canvas('canvas');
-  this.canvas.selection = false;
-};
-
-LadyMaze.prototype.initMusic = function() {
-  if (!this.opts.music) return;
-  const music = new Audio('sound/jj-cale-call-me-the-breezee-IDzMFe9y5JI.mp3');
-  music.play();
-};
-
-LadyMaze.prototype.initSound = function() {
+//////////////////////////////////////////////////////////////////////////
+LadyMaze.prototype.initSounds = function(cb) {
   if (!this.opts.sound) return;
   const debug = this.opts.debug;
   
@@ -94,33 +97,32 @@ LadyMaze.prototype.initSound = function() {
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
   this.audioContext = window.AudioContext ? new AudioContext() : null;
 
-  // Load the sounds
-  const soundNames = [ 'boing', 'squink', 'goal', ];
-  const sounds = {};
-
-  var start = new Date().getTime();
-  if (debug) console.info("Starting to load sounds, " + start);
-  soundNames.forEach(soundName => {
-    if (debug) console.info("Loading " + soundName);
+  // Load the sounds sequentially
+  this.sounds = {};
+  [ 'boing', 'squink', 'goal', ].reduce((prevCallback, name) => () => {
+    if (debug) console.info("Loading sound " + name);
 
     const request = new XMLHttpRequest();
-    request.soundName = soundName;   // Save the sound name in the request object
-    request.open('GET', `sound/${soundName}.mp3`, true);
+    request.soundName = name;   // Save the sound name in the request object
+    request.open('GET', `sound/${name}.mp3`, true);
     request.responseType = 'arraybuffer';
-
-    request.onload = function() {
+    request.onload = () => {
       this.audioContext.decodeAudioData(request.response,
-        function(buffer) {  // success
-          if (debug) console.info("Successfully decoded " + soundName);
-          sounds[soundName] = buffer;
+        // success
+        buffer => {
+          if (debug) console.info("Successfully decoded sound " + name);
+          this.sounds[name] = buffer;
+          prevCallback();
         },
-        function() {  // error
-          console.error("Error trying to decode audio data: " + soundName);
+        // failed
+        () => {
+          console.error("Error trying to decode audio data: " + name);
+          prevCallback();
         }
       );
     }
     request.send();
-  });
+  }, cb);
 };
 
 
@@ -349,24 +351,31 @@ LadyMaze.prototype.coords = function(row, col) {
 };
 
 /////////////////////////////////////////////////////////////////////
-LadyMaze.prototype.ready = function() {
-
-  const nr = this.rows;
-  const nc = this.cols;
-  const wt = this.wallThickness;
-  const cw = this.cellWidth;
-  const ch = this.cellHeight;
-  const cw_free = cw - wt;   // free space between walls
-  const ch_free = ch - wt;
-  const startCol = maze.startCol,
-  const spriteSize = Math.min(cw_free * 0.8, ch_free * 0.8);
-
-  const sprite;
-  const sprite_data = {
+LadyMaze.prototype.initSprite = function(cb) {
+  this.bug = {
     row: 0,
-    col: startCol,
+    col: this.startCol,
     dir: 'S'
   };
+
+  fabric.Image.fromURL('ladybug_red-100.png', sprite => {
+    const startCoords = coords(0, this.startCol);
+    const size = (Math.min(this.cellWidth, this.cellHeight) - this.wallThickness) * 0.8;
+
+    sprite.set({
+      left: startCoords.left,
+      top: startCoords.top,
+      width: size,
+      height: size,
+      angle: 180,
+    });
+
+    this.canvas.add(sprite);
+    this.animationInProgress = false;
+    cb();
+  });
+};
+
 
 
 /////////////////////////////////////////////////////////////////////
@@ -377,44 +386,41 @@ LadyMaze.prototype.handleKey = function(evt) {
 
   // Return if our previous animation isn't finished yet
   if (this.animationInProgress) return false;
-
-  const dir;    // new direction
-  const prop;   // property to animate
-  const delta;  // amount to animate
-  const angle;  // angle of the image, in degrees
-  const newCell;
-
-  if (k == 37) {
-    dir = 'W';
-    prop = 'left';
-    delta = '-=' + cw;
-    angle = 270;
-  }
-  else if (k == 38) {
-    dir = 'N';
-    prop = 'top';
-    delta = '-=' + ch;
-    angle = 0;
-  }
-  else if (k == 39) {
-    dir = 'E';
-    prop = 'left';
-    delta = '+=' + cw;
-    angle = 90;
-  }
-  else {
-    dir = 'S';
-    prop = 'top';
-    delta = '+=' + ch;
-    angle = 180;
-  }
+  
+  // What to do for each of the arrow (direction) keys
+  const dirKeys = {
+    37: {     // left
+      dir: 'W',
+      prop: 'left',  // property to animate
+      delta: '-=' + cw,
+      angle: 270,
+    },
+    38: {     // up
+      dir: 'N',
+      prop: 'top',
+      delta: '-=' + ch,
+      angle: 0,
+    },
+    39: {     // right
+      dir: 'E',
+      prop: 'left',
+      delta: '+=' + cw,
+      angle: 90,
+    },
+    40: {     // down
+      dir: 'S',
+      prop: 'top',
+      delta: '+=' + ch,
+      angle: 180,
+    },
+  };
 
   // Where are we, and can we go the way he wants?
-  const r = spriteData.row,
-  const c = spriteData.col,
-  const cell = this.cells[r][c],
-  const canMove = false,
-  const newCell = null;
+  const r = bug.row;
+  const c = bug.col;
+  const cell = this.cells[r][c];
+  var canMove = false;
+  var newCell = null;
 
   if (!cell.walls[dir].exists) {
     if (dir == 'W' && c != 0) {
@@ -435,11 +441,10 @@ LadyMaze.prototype.handleKey = function(evt) {
     }
   }
 
-  if (debug) console.info("can_move = " + can_move);
   if (!canMove) playSound('boing');
 
   // Define a function that will handle the move (as opposed to the rotation)
-  var animate_move = can_move ?
+  var animate_move = canMove ?
       function() {
           playSound('squink');
           if (dir == 'W')
@@ -480,7 +485,6 @@ LadyMaze.prototype.handleKey = function(evt) {
       } :
       function() {
           animation_in_progress = false;
-          if (debug) console.info("sorry");
       };
 
       if (debug) {
@@ -514,35 +518,16 @@ LadyMaze.prototype.handleKey = function(evt) {
       }
 
       return false;
-  });
-
-};
-
-/////////////////////////////////////////////////////////////////////
-LadyMaze.prototype.spriteLoaded = function(oImg) {
-    sprite = oImg;
-    const size = this.spriteSize;
-    const startCoords = coords(0, this.startCol);
-    sprite.set({
-      left: startCoords.left,
-      top: startCoords.top,
-      width: size,
-      height: size,
-      angle: 180
-    });
-
-    this.canvas.add(sprite);
-    this.animationInProgress = false;
-
-    $('body').on('keydown', this.handleKey.bind(this));
 };
 
 
 LadyMaze.prototype.playSound = function(soundName) {
   if (!this.opts.sound) return;
   var source = this.audioContext.createBufferSource();
-  source.buffer = sounds[soundName];
+  source.buffer = this.sounds[soundName];
   source.connect(this.audioContext.destination);
   source.start(0);
 };
 
+
+const maze = new LadyMaze();
